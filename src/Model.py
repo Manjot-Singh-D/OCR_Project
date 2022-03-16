@@ -32,6 +32,7 @@ class Model:
         self.mustRestore = mustRestore
         self.snapID = 0
 
+        # print(help(tf.lite.TFLiteConverter))
         # Whether to use normalization over a batch or a population
         self.is_train = tf.compat.v1.placeholder(tf.bool, name='is_train')
 
@@ -90,20 +91,16 @@ class Model:
         stacked = tf.compat.v1.nn.rnn_cell.MultiRNNCell(cells, state_is_tuple=True)
 
         # bidirectional RNN
-        # BxTxF -> BxTx2H
         ((fw, bw), _) = tf.compat.v1.nn.bidirectional_dynamic_rnn(cell_fw=stacked, cell_bw=stacked, inputs=rnnIn3d,
                                                                   dtype=rnnIn3d.dtype)
 
-        # BxTxH + BxTxH -> BxTx2H -> BxTx1X2H
         concat = tf.expand_dims(tf.concat([fw, bw], 2), 2)
 
-        # project output to chars (including blank): BxTx1x2H -> BxTx1xC -> BxTxC
         kernel = tf.Variable(tf.random.truncated_normal([1, 1, numHidden * 2, len(self.charList) + 1], stddev=0.1))
         self.rnnOut3d = tf.squeeze(tf.nn.atrous_conv2d(value=concat, filters=kernel, rate=1, padding='SAME'), axis=[2])
 
     def setupCTC(self):
         "create CTC loss and decoder and return them"
-        # BxTxC -> TxBxC
         self.ctcIn3dTBC = tf.transpose(a=self.rnnOut3d, perm=[1, 0, 2])
         # ground truth text as sparse tensor
         self.gtTexts = tf.SparseTensor(tf.compat.v1.placeholder(tf.int64, shape=[None, 2]),
@@ -144,8 +141,6 @@ class Model:
 
     def setupTF(self):
         "initialize TF"
-        print('Python: ' + sys.version)
-        print('Tensorflow: ' + tf.__version__)
 
         sess = tf.compat.v1.Session()  # TF session
 

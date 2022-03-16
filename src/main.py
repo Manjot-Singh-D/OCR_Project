@@ -163,6 +163,7 @@ def OCR(link):
         print(open(FilePaths.fnAccuracy).read())
         model = Model(open(FilePaths.fnCharList,'r').read(), decoderType, mustRestore=True, dump=args.dump)
         # modelDir = '../model/snapshot-21.data-00000-of-00001'
+        # converter = tf.lite.TFLiteConverter.from_saved_model(modelDir)
         # converter=tf.lite.TFLiteConverter.from_keras_model_file(model)
         # tflite=converter.convert()
         # infer(model, FilePaths.fnInfer)
