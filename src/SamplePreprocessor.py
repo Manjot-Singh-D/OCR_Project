@@ -22,7 +22,8 @@ def preprocess(img, imgSize, dataAugmentation=False):
 
     # create target image and copy sample image into it
     (wt, ht) = imgSize
-    (h, w) = img.shape
+    h, w = img.shape
+
     fx = w / wt
     fy = h / ht
     f = max(fx, fy)

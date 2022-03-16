@@ -2,9 +2,14 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
+from lib2to3.pytree import convert
 
 import cv2
 import editdistance
+import urllib
+from skimage import io
+import numpy as np
+import tensorflow as tf
 
 from .DataLoader import DataLoader, Batch
 from .Model import Model, DecoderType
@@ -99,16 +104,24 @@ def validate(model, loader):
 
 def infer(model, fnImg):
     "recognize text in image provided by file path"
-    img = preprocess(cv2.imread(fnImg, cv2.IMREAD_GRAYSCALE), Model.imgSize)
+    img = io.imread(fnImg)
+    # if req!=False:
+    # arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
+    print(f"---------------------------------------------Image : {img.shape}")
+    # cv2.imread(img, cv2.IMREAD_GRAYSCALE)
+    # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    img = preprocess(img, Model.imgSize)
     batch = Batch(None, [img])
     (recognized, probability) = model.inferBatch(batch, True)
     print('Recognized:', '"' + recognized[0] + '"')
     print('Probability:', probability[0])
+    return [recognized[0],probability[0]]
 
 
-def main():
+def OCR(link):
     "main function"
-    print("Running Main")
+    print(f"Running Main with parameter as Link : {link}")
     # optional command line args
     parser = argparse.ArgumentParser()
     parser.add_argument('--train', help='train the NN', action='store_true')
@@ -149,8 +162,11 @@ def main():
     else:
         print(open(FilePaths.fnAccuracy).read())
         model = Model(open(FilePaths.fnCharList,'r').read(), decoderType, mustRestore=True, dump=args.dump)
-        infer(model, FilePaths.fnInfer)
-
+        # modelDir = '../model/snapshot-21.data-00000-of-00001'
+        # converter=tf.lite.TFLiteConverter.from_keras_model_file(model)
+        # tflite=converter.convert()
+        # infer(model, FilePaths.fnInfer)
+        return infer(model,link)
 
 # if __name__ == '__main__':
 #     main()
