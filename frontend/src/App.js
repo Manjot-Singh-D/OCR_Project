@@ -6,10 +6,12 @@ function App() {
   const [image,setImage]=useState(null);
   const [result,setResult]=useState(null);
   const [submitClicked,setSubmitClicked]=useState(false);
-  
+  const [error,setError]=useState(false);
   const onFileChange = (event) => {
     const { name, value } = event.target;
     setSubmitClicked(false);
+    setResult(null);
+    setError(false);
     setImage((prevImage) => {
       return {
         ...prevImage,
@@ -21,9 +23,15 @@ function App() {
 
   const onFileUpload = () => {
     setSubmitClicked(true);
+    setError(false);
     axios.post("http://localhost:5000/api/uploadfile", image)
     .then((res)=>{
-      setResult(res.data[0]);
+      if(res.data[0].prob==="Error"){
+        setError(true);
+      }
+      else{
+        setResult(res.data[0]);
+      }
     })
     .catch((err)=>{
       console.log(err);
@@ -44,12 +52,18 @@ function App() {
         <button onClick={onFileUpload}>Upload!</button>
       </div>
       {image && dispFileData()}
-      {!result && submitClicked &&
+      {!result && !error && submitClicked &&
         <div className='result_Box'>
           Loading.....
         </div>
       }
-      {result && submitClicked && 
+      {
+        error && submitClicked &&
+        <div className='result_Box' style={{color:"#ff0000"}}>
+          SERVER ERROR!!
+        </div>
+      }
+      {result && !error && submitClicked && 
       <div className='result_Box'>
         Output : {result.rec}
         <br/>

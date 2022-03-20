@@ -104,19 +104,19 @@ def validate(model, loader):
 
 def infer(model, fnImg):
     "recognize text in image provided by file path"
-    img = io.imread(fnImg)
-    # if req!=False:
-    # arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
-    print(f"---------------------------------------------Image : {img.shape}")
-    # cv2.imread(img, cv2.IMREAD_GRAYSCALE)
-    # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-    img = preprocess(img, Model.imgSize)
-    batch = Batch(None, [img])
-    (recognized, probability) = model.inferBatch(batch, True)
-    print('Recognized:', '"' + recognized[0] + '"')
-    print('Probability:', probability[0])
-    return [recognized[0],probability[0]]
+    try:
+        img = io.imread(fnImg)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        img = preprocess(img, Model.imgSize)
+        batch = Batch(None, [img])
+        (recognized, probability) = model.inferBatch(batch, True)
+        print('Recognized:', '"' + recognized[0] + '"')
+        print('Probability:', probability[0])
+        return [recognized[0],probability[0]]
+    except:
+        return ["Error","Error"]
+
 
 
 def OCR(link):
@@ -162,12 +162,7 @@ def OCR(link):
     else:
         print(open(FilePaths.fnAccuracy).read())
         model = Model(open(FilePaths.fnCharList,'r').read(), decoderType, mustRestore=True, dump=args.dump)
-        # modelDir = '../model/snapshot-21.data-00000-of-00001'
-        # converter = tf.lite.TFLiteConverter.from_saved_model(modelDir)
-        # converter=tf.lite.TFLiteConverter.from_keras_model_file(model)
-        # tflite=converter.convert()
-        # infer(model, FilePaths.fnInfer)
         return infer(model,link)
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    OCR()
