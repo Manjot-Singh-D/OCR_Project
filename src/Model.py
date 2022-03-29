@@ -138,7 +138,17 @@ class Model:
             self.decoder = word_beam_search_module.word_beam_search(tf.nn.softmax(self.ctcIn3dTBC, axis=2), 50, 'Words',
                                                                     0.0, corpus.encode('utf8'), chars.encode('utf8'),
                                                                     wordChars.encode('utf8'))
+    def convertToTFLITE(self):
+        meta_path = 'model/snapshot-21.meta'
 
+        with tf.compat.v1.Session() as sess:
+            saver = tf.compat.v1.train.import_meta_graph(meta_path)
+            saver.restore(sess,tf.compat.v1.train.latest_checkpoint('model\snapshot-21.meta'))
+            frozen_graph_def = tf.compat.v1.graph_util.convert_variables_to_constants(
+                sess,
+                sess.graph_def)
+            with open('model/output_graph.pb', 'wb') as f:
+                f.write(frozen_graph_def.SerializeToString())
     def setupTF(self):
         "initialize TF"
 
@@ -278,3 +288,7 @@ class Model:
         "save model to file"
         self.snapID += 1
         self.saver.save(self.sess, 'model/snapshot', global_step=self.snapID)
+        try:
+            self.convertToTFLITE()
+        except:
+            pass

@@ -10,7 +10,7 @@ def upload_file():
     content = request.get_json()
     result=OCR(content['image_link'])
     res={}
-
+    # print(result)
     res={'rec':result[0],'prob':str(result[1])}
     li=[]
     li.append(res)

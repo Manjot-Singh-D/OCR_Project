@@ -23,9 +23,11 @@ function App() {
 
   const onFileUpload = () => {
     setSubmitClicked(true);
+    setResult(null);
     setError(false);
     axios.post("http://localhost:5000/api/uploadfile", image)
     .then((res)=>{
+      console.log("Response is : ",res);
       if(res.data[0].prob==="Error"){
         setError(true);
       }
@@ -46,7 +48,7 @@ function App() {
   };
   return (
     <div className="App">
-      <h1>Handwriting Detection</h1>
+      <h1>Optical Character Recognition</h1>
       <div className='imageInput'>
         <input type={"text"} name="image_link" onChange={onFileChange}/>
         <button onClick={onFileUpload}>Upload!</button>
@@ -67,7 +69,7 @@ function App() {
       <div className='result_Box'>
         Output : {result.rec}
         <br/>
-        Probability : {result.prob}
+        {/* Probability : {result.prob} */}
       </div>
     }
     </div>

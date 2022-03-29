@@ -14,7 +14,7 @@ import tensorflow as tf
 from .DataLoader import DataLoader, Batch
 from .Model import Model, DecoderType
 from .SamplePreprocessor import preprocess
-
+tf.compat.v1.reset_default_graph()
 
 class FilePaths:
     "filenames and paths to data"
@@ -112,7 +112,7 @@ def infer(model, fnImg):
         batch = Batch(None, [img])
         (recognized, probability) = model.inferBatch(batch, True)
         print('Recognized:', '"' + recognized[0] + '"')
-        print('Probability:', probability[0])
+        # print('Probability:', probability[0])
         return [recognized[0],probability[0]]
     except:
         return ["Error","Error"]
